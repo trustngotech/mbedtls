@@ -47,10 +47,12 @@
  * use MoveFileExA with the MOVEFILE_REPLACE_EXISTING flag instead.
  * Returns 0 on success, nonzero on failure. */
 #if defined(_WIN32)
-#define rename_replace_existing(oldpath, newpath) \
+#define remove_existing(newpath)
+#define rename_existing(oldpath, newpath) \
     (!MoveFileExA(oldpath, newpath, MOVEFILE_REPLACE_EXISTING))
 #else
-#define rename_replace_existing(oldpath, newpath) rename(oldpath, newpath)
+#define remove_existing(newpath) remove(newpath)
+#define rename_existing(oldpath, newpath) rename(oldpath, newpath)
 #endif
 
 typedef struct {
@@ -222,7 +224,8 @@ exit:
         }
     }
     if (status == PSA_SUCCESS) {
-        if (rename_replace_existing(PSA_ITS_STORAGE_TEMP, filename) != 0) {
+        remove_existing(filename);
+        if (rename_existing(PSA_ITS_STORAGE_TEMP, filename) != 0) {
             status = PSA_ERROR_STORAGE_FAILURE;
         }
     }
